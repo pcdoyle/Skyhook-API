@@ -1,1 +1,3 @@
 wukey = 'weather undergroud api key'
+twclientid = 'twitch client id'
+twsecret = 'twitch secret'
