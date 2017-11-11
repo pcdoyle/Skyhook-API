@@ -123,7 +123,7 @@ def twitch_getid(username):
 def twitch_followage(channelid,userid):
     """Get's the follow age between two users from the Twitch API."""
     try:
-        url = 'https://api.twitch.tv/helix/users/follows?from_id=%s&to_id=%s' % (channelid,userid)
+        url = 'https://api.twitch.tv/helix/users/follows?from_id=%s&to_id=%s' % (userid,channelid)
         headers = {'Client-ID': config.twclientid}
         request = requests.get(url, headers=headers)
         try:
@@ -135,7 +135,21 @@ def twitch_followage(channelid,userid):
 
     try:
         result = request['data'][0]['followed_at']
-    except Exception as err:
-        result = 'User is not following this channel.'
+        formatted_date = datetime.strptime( result, "%Y-%m-%dT%H:%M:%SZ" )
+        try:
+            currentdate = datetime.utcnow()
+            difference = relativedelta.relativedelta(currentdate,formatted_date)
 
-    return (result)
+            years = difference.years
+            months = difference.months
+            days = difference.days
+            hours = difference.hours
+            minutes = difference.minutes
+
+            return "%s years %s months %s days %s hours %s minutes" % (years,months,days,hours,minutes)
+        except Exception as err:
+            return 'An error occured in the date comparison.'
+    except Exception as err:
+        return 'User is not following this channel.'
+
+    return ('An error occured in the lookup.')
