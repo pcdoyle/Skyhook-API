@@ -1,3 +1,12 @@
+# Weather Underground API Key for this Application
 wukey = 'weather undergroud api key'
+
+# Client ID and Secret for application registration at dev.twitch.tv
 twclientid = 'twitch client id'
-twsecret = 'twitch secret'
+twsecret = 'twitch secret key'
+
+# For testing until OAUTH is probably built into the app.
+# Only required for checking things like subscriptions to a partnered channel.
+# Curretly I have this set to Skyhook's OAUTH registered to this application.
+# Eventually I will want to add loging into Twitch from the app to get this key.
+twoauth_test = 'twitch oauth key'
