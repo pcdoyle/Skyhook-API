@@ -63,10 +63,9 @@ def get_followage(channelname,username):
     """Get how long someone has been following a certain channel."""
     channelid = twitch_getid(channelname)
     userid = twitch_getid(username)
-    test = twitch_followage(channelid,userid)
+    follow_result = twitch_followage(channelid,userid)
 
-#   return Response('Channel Name: ' + channelname + ' User Name: ' + username + ' Channel ID: ' + channelid + ' User ID: ' + userid, mimetype='text/plain')
-    return Response('Test: ' + test, mimetype='text/plain')
+    return Response(follow_result, mimetype='text/plain')
 
 @app.route('/glitch/subage/<oauth>/<channelname>/<username>')
 def get_subage(oauth,channelname,username):
@@ -75,6 +74,7 @@ def get_subage(oauth,channelname,username):
 
 @app.route('/glitch/test')
 def glitch_test():
+    """Test Function to Testing Twitch API stuff."""
     return Response("Test function", mimetype='text/plain')
 
 @app.errorhandler(404)
