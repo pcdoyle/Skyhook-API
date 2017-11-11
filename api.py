@@ -46,6 +46,26 @@ def convert():
     """Will be a conversion function to convert units of distance, etc. Currently not being used."""
     return Response('Hello.', mimetype='text/plain')
 
+@app.route('/glitch/getid/<username>')
+def get_twitch_id(username):
+    """Will return the userid of a username on Twitch."""
+    return Response('Username: ' + username, mimetype='text/plain')
+
+@app.route('/glitch/getuser/<userid>')
+def get_twitch_user(userid):
+    """Will return user information from the userid given."""
+    return Response('User ID: ' + userid, mimetype='text/plain')
+
+@app.route('/glitch/followage/<channelname>/<username>')
+def get_followage(channelname,username):
+    """Get how long someone has been following a certain channel."""
+    return Response('Channel Name: ' + channelname + ' User Name: ' + username, mimetype='text/plain')
+
+@app.route('/glitch/subage/<oauth>/<channelname>/<username>')
+def get_subage(oauth,channelname,username):
+    """Get how long someone has been subbed a certain channel."""
+    return Response('OAuth Key: ' + oauth + ' Channel Name: ' + channelname + ' User Name: ' + username, mimetype='text/plain')
+
 @app.errorhandler(404)
 def page_not_found(error):
     """404 Error Handling function. Just returns a plaintext error."""
