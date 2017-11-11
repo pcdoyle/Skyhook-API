@@ -1,4 +1,6 @@
 from flask import Flask, Response, jsonify
+from datetime import datetime
+from dateutil import relativedelta
 import requests
 import config
 
@@ -10,7 +12,7 @@ def startpage():
     return Response('Skyhook\'s custom API Server.', mimetype='text/plain')
 
 @app.route('/weather')
-def weather():
+def get_weather():
     """Pulls Weather Data from Weather Underground: Currently only works for one location."""
     try:
         result = requests.get('http://api.wunderground.com/api/' + config.wukey + '/geolookup/conditions/q/pws:IBRITISH434.json')
@@ -41,10 +43,10 @@ def weather():
 
     return Response(weather_full, mimetype='text/plain')
 
-@app.route('/convert')
-def convert():
+@app.route('/convert/<unit_one>/<unit_two>/<value>')
+def convert(unit_one,unit_two,value):
     """Will be a conversion function to convert units of distance, etc. Currently not being used."""
-    return Response('Hello.', mimetype='text/plain')
+    return Response('Unit One: ' + unit_one + ' Unit Two: ' + unit_two + ' Value: ' + value, mimetype='text/plain')
 
 @app.route('/glitch/getid/<username>')
 def get_twitch_id(username):
@@ -59,14 +61,81 @@ def get_twitch_user(userid):
 @app.route('/glitch/followage/<channelname>/<username>')
 def get_followage(channelname,username):
     """Get how long someone has been following a certain channel."""
-    return Response('Channel Name: ' + channelname + ' User Name: ' + username, mimetype='text/plain')
+    channelid = twitch_getid(channelname)
+    userid = twitch_getid(username)
+    test = twitch_followage(channelid,userid)
+
+#   return Response('Channel Name: ' + channelname + ' User Name: ' + username + ' Channel ID: ' + channelid + ' User ID: ' + userid, mimetype='text/plain')
+    return Response('Test: ' + test, mimetype='text/plain')
 
 @app.route('/glitch/subage/<oauth>/<channelname>/<username>')
 def get_subage(oauth,channelname,username):
     """Get how long someone has been subbed a certain channel."""
     return Response('OAuth Key: ' + oauth + ' Channel Name: ' + channelname + ' User Name: ' + username, mimetype='text/plain')
 
+@app.route('/glitch/test')
+def glitch_test():
+    """Testing for date and time differences"""
+
+    #Aug 7 1989 8:10 pm
+    date_1 = datetime(1989, 8, 7, 20, 10)
+
+    #Dec 5 1990 5:20 am
+    date_2 = datetime(1990, 12, 5, 5, 20)
+
+    difference = relativedelta.relativedelta(date_2, date_1)
+
+    years = difference.years
+    months = difference.months
+    days = difference.days
+    hours = difference.hours
+    minutes = difference.minutes
+
+    return Response("Difference is " + str(years) + " years " + str(months) + " months " + str(days) + " days " + str(hours) + " hours " + str(minutes) + " minutes.", mimetype='text/plain')
+
 @app.errorhandler(404)
 def page_not_found(error):
     """404 Error Handling function. Just returns a plaintext error."""
     return Response('404 Error: Bad API call.', mimetype='text/plain')
+
+def twitch_getid(username):
+    """Gets Twitch ID by their username."""
+    try:
+        url = 'https://api.twitch.tv/helix/users?login=%s' % username
+        headers = {'Client-ID': config.twclientid}
+        request = requests.get(url, headers=headers)
+
+        try:
+            request = request.json()
+        except Exception as err:
+            return('Failed to format JSON data from Twitch!')
+
+    except requests.exceptions.RequestException as err:
+        return('Failed to connect to Twitch API server.')
+    
+    try:
+        result = request['data'][0]['id']
+    except Exception as err:
+        result = 'No user with that name found!'
+
+    return (result)
+
+def twitch_followage(channelid,userid):
+    """Get's the follow age between two users from the Twitch API."""
+    try:
+        url = 'https://api.twitch.tv/helix/users/follows?from_id=%s&to_id=%s' % (channelid,userid)
+        headers = {'Client-ID': config.twclientid}
+        request = requests.get(url, headers=headers)
+        try:
+            request = request.json()
+        except Exception as err:
+            return('Failed to format JSON data from Twitch!')
+    except requests.exceptions.RequestException as err:
+        return('Failed to connect to Twitch API server.')
+
+    try:
+        result = request['data'][0]['followed_at']
+    except Exception as err:
+        result = 'User is not following this channel.'
+
+    return (result)
