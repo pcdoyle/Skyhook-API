@@ -67,10 +67,15 @@ def get_followage(channelname,username):
 
     return Response(follow_result, mimetype='text/plain')
 
-@app.route('/glitch/subage/<oauth>/<channelname>/<username>')
-def get_subage(oauth,channelname,username):
+@app.route('/glitch/subage/<channelname>/<username>')
+def get_subage(channelname,username):
     """Get how long someone has been subbed a certain channel."""
-    return Response('OAuth Key: ' + oauth + ' Channel Name: ' + channelname + ' User Name: ' + username, mimetype='text/plain')
+    channelid = twitch_getid(channelname)
+    userid = twitch_getid(username)
+    oauth = config.twoauth_test
+    sub_result = twitch_subage(channelid,userid,oauth)
+
+    return Response(sub_result, mimetype='text/plain')
 
 @app.route('/glitch/test')
 def glitch_test():
@@ -130,10 +135,58 @@ def twitch_followage(channelid,userid):
             hours = difference.hours
             minutes = difference.minutes
 
-            return "%s years %s months %s days %s hours %s minutes" % (years,months,days,hours,minutes)
+            return "%s years %s months %s days %s hours %s minutes." % (years,months,days,hours,minutes)
         except Exception as err:
             return 'An error occured in the date comparison.'
     except Exception as err:
         return 'User is not following this channel.'
+
+    return ('An error occured in the lookup.')
+
+def twitch_subage(channelid,userid,oauth):
+    """Get's the follow age between two users from the Twitch API."""
+    try:
+        url = 'https://api.twitch.tv/kraken/channels/%s/subscriptions/%s' % (channelid,userid)
+        headers = {'Accept': 'application/vnd.twitchtv.v5+json', 'Client-ID': config.twclientid, 'Authorization': 'OAuth ' + oauth}
+        request = requests.get(url, headers=headers)
+        try:
+            request = request.json()
+        except Exception as err:
+            return('Failed to format JSON data from Twitch!')
+    except requests.exceptions.RequestException as err:
+        return('Failed to connect to Twitch API server.')
+
+    try:
+        sub_date = request['created_at']
+        sub_type = request['sub_plan']
+
+
+        formatted_date = datetime.strptime( sub_date, "%Y-%m-%dT%H:%M:%SZ" )
+        try:
+            currentdate = datetime.utcnow()
+            difference = relativedelta.relativedelta(currentdate,formatted_date)
+
+            years = difference.years
+            months = difference.months
+            days = difference.days
+            hours = difference.hours
+            minutes = difference.minutes
+
+            sub_length = "%s years %s months %s days %s hours %s minutes." % (years,months,days,hours,minutes)
+
+            if sub_type == 'Prime':
+                return 'Prime sub for ' + sub_length
+            elif sub_type == '1000':
+                return '$4.99 sub for ' + sub_length
+            elif sub_type == '2000':
+                return '$9.99 sub for ' + sub_length
+            elif sub_type == '3000':
+                return '$24.99 sub for ' + sub_length
+            else:
+                return 'Sub for: ' + sub_length + ' (Error: Couldn\'t get subscription type.)'
+        except Exception as err:
+            return 'An error occured in the date comparison.'
+    except Exception as err:
+        return 'User is not subscribed to this channel.'
 
     return ('An error occured in the lookup.')
