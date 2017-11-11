@@ -75,23 +75,7 @@ def get_subage(oauth,channelname,username):
 
 @app.route('/glitch/test')
 def glitch_test():
-    """Testing for date and time differences"""
-
-    #Aug 7 1989 8:10 pm
-    date_1 = datetime(1989, 8, 7, 20, 10)
-
-    #Dec 5 1990 5:20 am
-    date_2 = datetime(1990, 12, 5, 5, 20)
-
-    difference = relativedelta.relativedelta(date_2, date_1)
-
-    years = difference.years
-    months = difference.months
-    days = difference.days
-    hours = difference.hours
-    minutes = difference.minutes
-
-    return Response("Difference is " + str(years) + " years " + str(months) + " months " + str(days) + " days " + str(hours) + " hours " + str(minutes) + " minutes.", mimetype='text/plain')
+    return Response("Test function", mimetype='text/plain')
 
 @app.errorhandler(404)
 def page_not_found(error):
