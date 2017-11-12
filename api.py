@@ -60,7 +60,7 @@ def convert(unit_one,unit_two,value):
     except Exception as err:
         return Response('Unable to convert ' + unit_one + ' to ' + unit_two, mimetype='text/plain')
 
-    return Response(value + unit_one + ' to ' + unit_two + ' is ' + str(convert), mimetype='text/plain')
+    return Response(value + unit_one + ' to ' + unit_two + ' is ' + str(round(convert, 2)), mimetype='text/plain')
 
 @app.route('/glitch/getid/<username>')
 def get_twitch_id(username):
