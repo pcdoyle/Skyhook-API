@@ -1,8 +1,12 @@
 from flask import Flask, Response, jsonify
 from datetime import datetime
 from dateutil import relativedelta
+from pint import UnitRegistry
 import requests
 import config
+
+ureg = UnitRegistry()
+Q_ = ureg.Quantity
 
 app = Flask(__name__)
 
@@ -43,10 +47,20 @@ def get_weather():
 
     return Response(weather_full, mimetype='text/plain')
 
-@app.route('/convert/<unit_one>/<unit_two>/<value>')
+@app.route('/convert_beta/<unit_one>/<unit_two>/<value>')
 def convert(unit_one,unit_two,value):
-    """Will be a conversion function to convert units of distance, etc. Currently not being used."""
-    return Response('Unit One: ' + unit_one + ' Unit Two: ' + unit_two + ' Value: ' + value, mimetype='text/plain')
+    """Will be a conversion function to convert units of measurement."""
+    """This is entirely test based on a pint example, 
+       don't use this code for anything ever."""
+
+    try:
+        user_input = '%s * %s to %s' % (value,unit_one,unit_two)
+        src, dst = user_input.split(' to ')
+        convert = Q_(src).to(dst)
+    except Exception as err:
+        return Response('Unable to convert ' + unit_one + ' to ' + unit_two, mimetype='text/plain')
+
+    return Response(value + unit_one + ' to ' + unit_two + ' is ' + str(convert), mimetype='text/plain')
 
 @app.route('/glitch/getid/<username>')
 def get_twitch_id(username):
