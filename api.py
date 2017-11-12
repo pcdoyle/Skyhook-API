@@ -49,18 +49,18 @@ def get_weather():
 
 @app.route('/beta_convert/<unit_one>/<unit_two>/<value>')
 def convert(unit_one,unit_two,value):
-    """Will be a conversion function to convert units of measurement."""
-    """This is entirely test based on a pint example, 
-       don't use this code for anything ever."""
-
+    """Will be a conversion function to convert units of measurement.
+    This is entirely test based on a pint example, don't use this
+    code for anything ever. Also need to make this user friendly.
+    It currently doesn't say the units in a easily readable way."""
     try:
         user_input = '%s * %s to %s' % (value,unit_one,unit_two)
         src, dst = user_input.split(' to ')
         convert = Q_(src).to(dst)
     except Exception as err:
-        return Response('Unable to convert ' + unit_one + ' to ' + unit_two, mimetype='text/plain')
+        return Response('Unable to convert ' + unit_one + ' to ' + unit_two + ' [This API is in Beta]', mimetype='text/plain')
 
-    return Response(value + unit_one + ' to ' + unit_two + ' is ' + str(round(convert, 2)), mimetype='text/plain')
+    return Response(value + unit_one + ' to ' + unit_two + ' is ' + str(round(convert, 2)) + ' [This API is in Beta]', mimetype='text/plain')
 
 @app.route('/glitch/getid/<username>')
 def get_twitch_id(username):
