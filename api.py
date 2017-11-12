@@ -97,17 +97,17 @@ def twitch_getid(username):
         try:
             request = request.json()
         except Exception as err:
-            return('Failed to format JSON data from Twitch!')
+            return 'Failed to format JSON data from Twitch!'
 
     except requests.exceptions.RequestException as err:
-        return('Failed to connect to Twitch API server.')
+        return 'Failed to connect to Twitch API server.'
     
     try:
         result = request['data'][0]['id']
     except Exception as err:
         result = 'No user with that name found!'
 
-    return (result)
+    return result
 
 def twitch_followage(channelid,userid):
     """Get's the follow age between two users from the Twitch API."""
@@ -118,9 +118,9 @@ def twitch_followage(channelid,userid):
         try:
             request = request.json()
         except Exception as err:
-            return('Failed to format JSON data from Twitch!')
+            return 'Failed to format JSON data from Twitch!'
     except requests.exceptions.RequestException as err:
-        return('Failed to connect to Twitch API server.')
+        return 'Failed to connect to Twitch API server.'
 
     try:
         result = request['data'][0]['followed_at']
@@ -141,7 +141,7 @@ def twitch_followage(channelid,userid):
     except Exception as err:
         return 'User is not following this channel.'
 
-    return ('An error occured in the lookup.')
+    return 'An error occured in the lookup.'
 
 def twitch_subage(channelid,userid,oauth):
     """Get's the follow age between two users from the Twitch API."""
@@ -151,10 +151,11 @@ def twitch_subage(channelid,userid,oauth):
         request = requests.get(url, headers=headers)
         try:
             request = request.json()
+            print(request)
         except Exception as err:
-            return('Failed to format JSON data from Twitch!')
+            return 'Failed to format JSON data from Twitch!'
     except requests.exceptions.RequestException as err:
-        return('Failed to connect to Twitch API server.')
+        return 'Failed to connect to Twitch API server.'
 
     try:
         sub_date = request['created_at']
@@ -189,4 +190,4 @@ def twitch_subage(channelid,userid,oauth):
     except Exception as err:
         return 'User is not subscribed to this channel.'
 
-    return ('An error occured in the lookup.')
+    return 'An error occured in the lookup.'
