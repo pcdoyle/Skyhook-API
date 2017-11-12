@@ -9,6 +9,9 @@ Will keep updating this as time goes on.
 * The following modules: datetime, python-dateutil, requests.
 * A config.py file for the API keys, it's example file is in the repository as config.py.example.
 
+### Usage
+* The master branch is active on http://api.skyhookart.com/
+
 ## NOTE:
 This is a work in progress and the first major project I have worked on in Python, as well as the first project that I have used to make Twitch API calls. This project is going to change A LOT. I'll probably have to clean up code while I learn Python.
 
