@@ -47,7 +47,7 @@ def get_weather():
 
     return Response(weather_full, mimetype='text/plain')
 
-@app.route('/convert_beta/<unit_one>/<unit_two>/<value>')
+@app.route('/beta_convert/<unit_one>/<unit_two>/<value>')
 def convert(unit_one,unit_two,value):
     """Will be a conversion function to convert units of measurement."""
     """This is entirely test based on a pint example, 
