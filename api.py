@@ -205,3 +205,6 @@ def twitch_subage(channelid,userid,oauth):
         return 'User is not subscribed to this channel.'
 
     return 'An error occured in the lookup.'
+
+if __name__ == "__main__":
+    app.run()
