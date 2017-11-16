@@ -17,12 +17,6 @@ from pint import UnitRegistry
 import requests
 import config
 
-"""
-Required Global Variables:
-"""
-ureg = UnitRegistry()
-Q_ = ureg.Quantity
-
 app = Flask(__name__)
 
 @app.route('/')
@@ -68,10 +62,10 @@ def convert(unit_one,unit_two,value):
     This is entirely test based on a pint example, don't use this
     code for anything ever. Also need to make this user friendly.
     It currently doesn't say the units in a easily readable way."""
+    ureg = UnitRegistry()
+
     try:
-        user_input = '%s * %s to %s' % (value, unit_one, unit_two)
-        src, dst = user_input.split(' to ')
-        converted = Q_(src).to(dst)
+        converted = ureg.Quantity(value + ' * ' + unit_one).to(unit_two)
     except Exception as err:
         return Response('Unable to convert ' + unit_one + ' to ' + unit_two + ' [This API is in Beta]', mimetype='text/plain')
 
@@ -172,7 +166,7 @@ def twitch_followage(channelid,userid):
 
     return 'An error occured in the lookup.'
 
-def twitch_subage(channelid,userid,oauth):
+def twitch_subage(channelid, userid, oauth):
     """Get's the follow age between two users from the Twitch API."""
     try:
         url = 'https://api.twitch.tv/kraken/channels/%s/subscriptions/%s' % (channelid,userid)
@@ -191,10 +185,10 @@ def twitch_subage(channelid,userid,oauth):
         sub_type = request['sub_plan']
 
 
-        formatted_date = datetime.strptime( sub_date, "%Y-%m-%dT%H:%M:%SZ" )
+        formatted_date = datetime.strptime(sub_date, "%Y-%m-%dT%H:%M:%SZ" )
         try:
             currentdate = datetime.utcnow()
-            difference = relativedelta.relativedelta(currentdate,formatted_date)
+            difference = relativedelta.relativedelta(currentdate, formatted_date)
 
             years = difference.years
             months = difference.months
@@ -212,8 +206,6 @@ def twitch_subage(channelid,userid,oauth):
                 return '$9.99 sub for ' + sub_length
             elif sub_type == '3000':
                 return '$24.99 sub for ' + sub_length
-            else:
-                return 'Sub for: ' + sub_length + ' (Error: Couldn\'t get subscription type.)'
         except Exception as err:
             return 'An error occured in the date comparison.'
     except Exception as err:
