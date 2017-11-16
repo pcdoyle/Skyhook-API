@@ -6,8 +6,14 @@ Will keep updating this as time goes on.
 
 #### Requirements
 * Python 3 (https://python.org) and Flask (http://flask.pocoo.org).
-* The following modules: datetime, python-dateutil, requests.
-* A config.py file for the API keys, it's example file is in the repository as config.py.example.
+* The following modules:
+  * Flask - Flask framework for web python.
+  * datetime - Date utilities.
+  * python-dateutil - Date utilities.
+  * requests - For API HTTPS requests (Weather Underground and Twitch API).
+  * pint - For unit conversions.
+    * Note: Probably going to replace this module as I don't like it.
+* A config.py file for the API keys, it's example file is in the repository as "config.py.example."
 
 ### Usage
 * The master branch is active on http://api.skyhookart.com/
@@ -18,4 +24,4 @@ This is a work in progress and the first major project I have worked on in Pytho
 I will have to spend a lot more time documenting as well, though I have comments to explain what every function is for.
 
 ### TO-DO:
-Clean up functions, and standardize the naming scheme for them.
+* Clean up functions, and standardize the naming scheme for them.
