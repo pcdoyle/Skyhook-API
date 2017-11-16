@@ -1,10 +1,25 @@
-from flask import Flask, Response, jsonify
+"""
+Skyhook-API
+Copyright 2017: Patrick Doyle. (KaoAtlantis on Twitch)
+Repositoy: https://github.com/pcdoyle/Skyhook-API
+License: MIT
+____________________________________________________________________
+Required Modules:
+- datetime        - For date manipulation and common date functions.
+- flask           - Flask project: http://flask.pocoo.org/
+- python-dateutil - dateutil for Python 3
+- pint            - For unit conversions.
+"""
 from datetime import datetime
+from flask import Flask, Response
 from dateutil import relativedelta
 from pint import UnitRegistry
 import requests
 import config
 
+"""
+Required Global Variables:
+"""
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
@@ -54,13 +69,13 @@ def convert(unit_one,unit_two,value):
     code for anything ever. Also need to make this user friendly.
     It currently doesn't say the units in a easily readable way."""
     try:
-        user_input = '%s * %s to %s' % (value,unit_one,unit_two)
+        user_input = '%s * %s to %s' % (value, unit_one, unit_two)
         src, dst = user_input.split(' to ')
-        convert = Q_(src).to(dst)
+        converted = Q_(src).to(dst)
     except Exception as err:
         return Response('Unable to convert ' + unit_one + ' to ' + unit_two + ' [This API is in Beta]', mimetype='text/plain')
 
-    return Response(value + unit_one + ' to ' + unit_two + ' is ' + str(round(convert, 2)) + ' [This API is in Beta]', mimetype='text/plain')
+    return Response(value + unit_one + ' to ' + unit_two + ' is ' + str(round(converted, 2)) + ' [This API is in Beta]', mimetype='text/plain')
 
 @app.route('/glitch/getid/<username>')
 def get_twitch_id(username):
@@ -77,7 +92,7 @@ def get_followage(channelname,username):
     """Get how long someone has been following a certain channel."""
     channelid = twitch_getid(channelname)
     userid = twitch_getid(username)
-    follow_result = twitch_followage(channelid,userid)
+    follow_result = twitch_followage(channelid, userid)
 
     return Response(follow_result, mimetype='text/plain')
 
@@ -87,7 +102,7 @@ def get_subage(channelname,username):
     channelid = twitch_getid(channelname)
     userid = twitch_getid(username)
     oauth = config.twoauth_test
-    sub_result = twitch_subage(channelid,userid,oauth)
+    sub_result = twitch_subage(channelid, userid, oauth)
 
     return Response(sub_result, mimetype='text/plain')
 
@@ -126,7 +141,7 @@ def twitch_getid(username):
 def twitch_followage(channelid,userid):
     """Get's the follow age between two users from the Twitch API."""
     try:
-        url = 'https://api.twitch.tv/helix/users/follows?from_id=%s&to_id=%s' % (userid,channelid)
+        url = 'https://api.twitch.tv/helix/users/follows?from_id=%s&to_id=%s' % (userid, channelid)
         headers = {'Client-ID': config.twclientid}
         request = requests.get(url, headers=headers)
         try:
@@ -141,7 +156,7 @@ def twitch_followage(channelid,userid):
         formatted_date = datetime.strptime( result, "%Y-%m-%dT%H:%M:%SZ" )
         try:
             currentdate = datetime.utcnow()
-            difference = relativedelta.relativedelta(currentdate,formatted_date)
+            difference = relativedelta.relativedelta(currentdate, formatted_date)
 
             years = difference.years
             months = difference.months
@@ -149,7 +164,7 @@ def twitch_followage(channelid,userid):
             hours = difference.hours
             minutes = difference.minutes
 
-            return "%s years %s months %s days %s hours %s minutes." % (years,months,days,hours,minutes)
+            return "%s years %s months %s days %s hours %s minutes." % (years, months, days, hours, minutes)
         except Exception as err:
             return 'An error occured in the date comparison.'
     except Exception as err:
@@ -187,7 +202,7 @@ def twitch_subage(channelid,userid,oauth):
             hours = difference.hours
             minutes = difference.minutes
 
-            sub_length = "%s years %s months %s days %s hours %s minutes." % (years,months,days,hours,minutes)
+            sub_length = "%s years %s months %s days %s hours %s minutes." % (years, months, days, hours, minutes)
 
             if sub_type == 'Prime':
                 return 'Prime sub for ' + sub_length
@@ -207,4 +222,4 @@ def twitch_subage(channelid,userid,oauth):
     return 'An error occured in the lookup.'
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
