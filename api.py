@@ -174,7 +174,6 @@ def twitch_subage(channelid, userid, oauth):
         request = requests.get(url, headers=headers)
         try:
             request = request.json()
-            print(request)
         except Exception as err:
             return 'Failed to format JSON data from Twitch!'
     except requests.exceptions.RequestException as err:
