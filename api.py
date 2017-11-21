@@ -115,7 +115,15 @@ def get_subage(channelname, username):
 @app.route('/glitch/test')
 def glitch_test():
     """Test Function to Testing Twitch API stuff."""
-    return Response("Test function", mimetype='text/plain')
+    years = 1
+    months = 0
+    days = 4
+    hours = 2
+    minutes = 1
+            
+    diff_string = string_time(years, months, days, hours, minutes)
+
+    return Response(diff_string, mimetype='text/plain')
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -169,13 +177,12 @@ def twitch_followage(channelid, userid):
             days = difference.days
             hours = difference.hours
             minutes = difference.minutes
-            
+
             diff_string = string_time(years, months, days, hours, minutes)
 
-            #return "%s years %s months %s days %s hours %s minutes." % (years, months, days, hours, minutes)
             return diff_string
         except Exception as err:
-            return 'An error occured in the date comparison. %s' % err
+            return 'An error occured in the date comparison.'
     except Exception as err:
         return 'User is not following this channel.'
 
@@ -196,8 +203,7 @@ def twitch_subage(channelid, userid, oauth):
 
     try:
         sub_date = request['created_at']
-        sub_type = request['sub_plan']
-
+        sub_plan = request['sub_plan']
 
         formatted_date = datetime.strptime(sub_date, "%Y-%m-%dT%H:%M:%SZ")
         try:
@@ -210,16 +216,16 @@ def twitch_subage(channelid, userid, oauth):
             hours = difference.hours
             minutes = difference.minutes
 
-            sub_length = "%s years %s months %s days %s hours %s minutes." % (years, months, days, hours, minutes)
+            diff_string = string_time(years, months, days, hours, minutes)
 
-            if sub_type == 'Prime':
-                return 'Prime sub for ' + sub_length
-            elif sub_type == '1000':
-                return '$4.99 sub for ' + sub_length
-            elif sub_type == '2000':
-                return '$9.99 sub for ' + sub_length
-            elif sub_type == '3000':
-                return '$24.99 sub for ' + sub_length
+            if sub_plan == 'Prime':
+                return 'Prime sub for %s' % diff_string
+            elif sub_plan == '1000':
+                return '$4.99 sub for %s' % diff_string
+            elif sub_plan == '2000':
+                return '$9.99 sub for %s' % diff_string
+            elif sub_plan == '3000':
+                return '$24.99 sub for %s' % diff_string
         except Exception as err:
             return 'An error occured in the date comparison.'
     except Exception as err:
@@ -229,15 +235,25 @@ def twitch_subage(channelid, userid, oauth):
 
 def string_time(years, months, days, hours, minutes):
     """ Figures out what needs to be output between year, month, day, hour, and minute."""
-    string = ''
-
     year_text = pluralize(years, 'year')
     month_text = pluralize(months, 'month')
     day_text = pluralize(days, 'day')
     hour_text = pluralize(hours, 'hour')
     minute_text = pluralize(minutes, 'minute')
 
-    string = '%s %s %s %s %s %s %s %s %s %s.' % (str(years), year_text, str(months), month_text, str(days), day_text, str(hours), hour_text, str(minutes), minute_text)
+    string = '%s %s.' % (str(minutes), minute_text)
+
+    if hours > 0:
+        string = '%s %s %s' % (str(hours), hour_text, string)
+
+    if days > 0:
+        string = '%s %s %s' % (str(days), day_text, string)
+
+    if months > 0:
+        string = '%s %s %s' % (str(months), month_text, string)
+
+    if years > 0:
+        string = '%s %s %s' % (str(years), year_text, string)
 
     return string
 
@@ -245,9 +261,7 @@ def pluralize(number, word):
     """Figures out if a word needs to be pluralized depending on the number provided."""
     if not number == 1:
         word += 's'
-
     return word
-
 
 if __name__ == "__main__":
     app.run(debug=True)
