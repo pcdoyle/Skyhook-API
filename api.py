@@ -169,10 +169,13 @@ def twitch_followage(channelid, userid):
             days = difference.days
             hours = difference.hours
             minutes = difference.minutes
+            
+            diff_string = string_time(years, months, days, hours, minutes)
 
-            return "%s years %s months %s days %s hours %s minutes." % (years, months, days, hours, minutes)
+            #return "%s years %s months %s days %s hours %s minutes." % (years, months, days, hours, minutes)
+            return diff_string
         except Exception as err:
-            return 'An error occured in the date comparison.'
+            return 'An error occured in the date comparison. %s' % err
     except Exception as err:
         return 'User is not following this channel.'
 
@@ -223,6 +226,28 @@ def twitch_subage(channelid, userid, oauth):
         return 'User is not subscribed to this channel.'
 
     return 'An error occured in the lookup.'
+
+def string_time(years, months, days, hours, minutes):
+    """ Figures out what needs to be output between year, month, day, hour, and minute."""
+    string = ''
+
+    year_text = pluralize(years, 'year')
+    month_text = pluralize(months, 'month')
+    day_text = pluralize(days, 'day')
+    hour_text = pluralize(hours, 'hour')
+    minute_text = pluralize(minutes, 'minute')
+
+    string = '%s %s %s %s %s %s %s %s %s %s.' % (str(years), year_text, str(months), month_text, str(days), day_text, str(hours), hour_text, str(minutes), minute_text)
+
+    return string
+
+def pluralize(number, word):
+    """Figures out if a word needs to be pluralized depending on the number provided."""
+    if not number == 1:
+        word += 's'
+
+    return word
+
 
 if __name__ == "__main__":
     app.run(debug=True)
