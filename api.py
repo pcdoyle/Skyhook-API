@@ -39,18 +39,30 @@ def get_weather():
     try:
         weather_desc = weather['current_observation']['weather']
         temp_c = weather['current_observation']['temp_c']
+        temp_c_feels = weather['current_observation']['feelslike_c']
+        wind_chill_c = weather['current_observation']['windchill_c']
         temp_f = weather['current_observation']['temp_f']
         wind_kmh = weather['current_observation']['wind_kph']
         wind_kmh_gust = weather['current_observation']['wind_gust_kph']
+        wind_string = weather['current_observation']['wind_string']
     except Exception as err:
         return Response('Failed to pull weather data! Usually caused by an incorrect API key.', mimetype='text/plain')
 
     weather_full = '%s with a temperature of %s°C (%s°F)' % (str(weather_desc), str(temp_c), str(temp_f))
 
-    if float(wind_kmh_gust) > 0:
-        weather_full = '%s. Wind is currently blowing at %skm/h with gusts of %skm/h.' % (str(weather_full), str(wind_kmh), str(wind_kmh_gust))
-    elif float(wind_kmh) > 0:
-        weather_full = '%s. Wind is currently blowing at %skm/h.' % (str(weather_full), str(wind_kmh))
+    if float(temp_c_feels) < float(temp_c):
+        weather_full += '. It feels like %s°C' % str(temp_c_feels)
+
+    if float(wind_kmh) > 0:
+        if float(wind_kmh_gust) > 0:
+            weather_full += '. The wind is currently blowing at %skm/h with gusts of %skm/h' % (str(wind_kmh), str(wind_kmh_gust))
+        else:
+            weather_full += '. The wind is currently blowing at %skm/h' % str(wind_kmh)
+
+        if float(wind_chill_c) > float(temp_c):
+            weather_full += '. The wind chill is %s°C.' % str(wind_chill_c)
+        else:
+            weather_full += '.'
     else:
         weather_full = '%s. There is curently no wind.' % str(weather_full)
 
@@ -82,7 +94,7 @@ def get_twitch_user(userid):
     return Response('User ID: ' + userid, mimetype='text/plain')
 
 @app.route('/glitch/followage/<channelname>/<username>')
-def get_followage(channelname,username):
+def get_followage(channelname, username):
     """Get how long someone has been following a certain channel."""
     channelid = twitch_getid(channelname)
     userid = twitch_getid(username)
@@ -91,7 +103,7 @@ def get_followage(channelname,username):
     return Response(follow_result, mimetype='text/plain')
 
 @app.route('/glitch/subage/<channelname>/<username>')
-def get_subage(channelname,username):
+def get_subage(channelname, username):
     """Get how long someone has been subbed a certain channel."""
     channelid = twitch_getid(channelname)
     userid = twitch_getid(username)
@@ -132,7 +144,7 @@ def twitch_getid(username):
 
     return result
 
-def twitch_followage(channelid,userid):
+def twitch_followage(channelid, userid):
     """Get's the follow age between two users from the Twitch API."""
     try:
         url = 'https://api.twitch.tv/helix/users/follows?from_id=%s&to_id=%s' % (userid, channelid)
@@ -169,7 +181,7 @@ def twitch_followage(channelid,userid):
 def twitch_subage(channelid, userid, oauth):
     """Get's the follow age between two users from the Twitch API."""
     try:
-        url = 'https://api.twitch.tv/kraken/channels/%s/subscriptions/%s' % (channelid,userid)
+        url = 'https://api.twitch.tv/kraken/channels/%s/subscriptions/%s' % (channelid, userid)
         headers = {'Accept': 'application/vnd.twitchtv.v5+json', 'Client-ID': config.twclientid, 'Authorization': 'OAuth ' + oauth}
         request = requests.get(url, headers=headers)
         try:
@@ -184,7 +196,7 @@ def twitch_subage(channelid, userid, oauth):
         sub_type = request['sub_plan']
 
 
-        formatted_date = datetime.strptime(sub_date, "%Y-%m-%dT%H:%M:%SZ" )
+        formatted_date = datetime.strptime(sub_date, "%Y-%m-%dT%H:%M:%SZ")
         try:
             currentdate = datetime.utcnow()
             difference = relativedelta.relativedelta(currentdate, formatted_date)
