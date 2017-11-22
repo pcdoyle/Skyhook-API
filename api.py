@@ -59,7 +59,7 @@ def get_weather():
         else:
             weather_full += '. The wind is currently blowing at %skm/h' % str(wind_kmh)
 
-        if float(wind_chill_c) > float(temp_c):
+        if float(wind_chill_c) < float(temp_c):
             weather_full += '. The wind chill is %s°C.' % str(wind_chill_c)
         else:
             weather_full += '.'
@@ -85,8 +85,9 @@ def convert(unit_one,unit_two,value):
 
 @app.route('/glitch/getid/<username>')
 def get_twitch_id(username):
-    """Will return the userid of a username on Twitch."""
-    return Response('Username: ' + username, mimetype='text/plain')
+    """Returns the userid of a username on Twitch."""
+    twitch_id = twitch_getid(username)
+    return Response(twitch_id, mimetype='text/plain')
 
 @app.route('/glitch/getuser/<userid>')
 def get_twitch_user(userid):
@@ -120,7 +121,7 @@ def glitch_test():
     days = 4
     hours = 2
     minutes = 1
-            
+
     diff_string = string_time(years, months, days, hours, minutes)
 
     return Response(diff_string, mimetype='text/plain')
@@ -144,7 +145,7 @@ def twitch_getid(username):
 
     except requests.exceptions.RequestException as err:
         return 'Failed to connect to Twitch API server.'
-    
+
     try:
         result = request['data'][0]['id']
     except Exception as err:
