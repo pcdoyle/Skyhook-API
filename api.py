@@ -28,7 +28,7 @@ def startpage():
 def get_weather():
     """Pulls Weather Data from Weather Underground: Currently only works for one location."""
     try:
-        result = requests.get('http://api.wunderground.com/api/' + config.wukey + '/geolookup/conditions/q/pws:IBRITISH434.json')
+        result = requests.get('http://api.wunderground.com/api/' + config.wukey + '/geolookup/conditions/q/pws:IBCABBOT1.json')
         try:
             weather = result.json()
         except Exception as err:
@@ -265,4 +265,4 @@ def pluralize(number, word):
     return word
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
