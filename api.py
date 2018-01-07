@@ -13,6 +13,7 @@ Required Modules:
 from datetime import datetime
 from flask import Flask, Response
 from dateutil import relativedelta
+import dateutil.parser
 from pint import UnitRegistry
 import requests
 import config
@@ -108,10 +109,19 @@ def get_subage(channelname, username):
     """Get how long someone has been subbed a certain channel."""
     channelid = twitch_getid(channelname)
     userid = twitch_getid(username)
-    oauth = config.twoauth_test
+    oauth = config.twoauth_new
     sub_result = twitch_subage(channelid, userid, oauth)
 
     return Response(sub_result, mimetype='text/plain')
+
+@app.route('/glitch/userage/<username>')
+def get_userage(username):
+    """Get how long someone has been following a certain channel."""
+    userid = twitch_getid(username)
+    d = twitch_userage(userid)
+    response = d.strftime('%B %d, %Y at %I:%M %p %Z')
+
+    return Response(response, mimetype='text/plain')
 
 @app.route('/glitch/test')
 def glitch_test():
@@ -230,7 +240,32 @@ def twitch_subage(channelid, userid, oauth):
         except Exception as err:
             return 'An error occured in the date comparison.'
     except Exception as err:
-        return 'User is not subscribed to this channel.'
+        return 'User is not subscribed to this channel. '
+
+    return 'An error occured in the lookup.'
+
+def twitch_userage(userid):
+    """Get's the follow age between two users from the Twitch API."""
+    try:
+        url = 'https://api.twitch.tv/kraken/users/%s' % (userid)
+        headers = {'Accept': 'application/vnd.twitchtv.v5+json', 'Client-ID': config.twclientid}
+        request = requests.get(url, headers=headers)
+        try:
+            request = request.json()
+        except Exception as err:
+            return 'Failed to format JSON data from Twitch!'
+    except requests.exceptions.RequestException as err:
+        return 'Failed to connect to Twitch API server.'
+
+    try:
+        result = request['created_at']
+        #formatted_date = datetime.strptime(result, "%Y-%m-%d %H:%M:%S.%fZ")
+        formatted_date = dateutil.parser.parse(result)
+
+        return formatted_date
+
+    except Exception as err:
+        return 'User age could not be found.'
 
     return 'An error occured in the lookup.'
 
