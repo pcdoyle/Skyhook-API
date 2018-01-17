@@ -19,7 +19,7 @@ Will keep updating this as time goes on.
 * The master branch is active on http://api.skyhookart.com/
 
 ## NOTE:
-This is a work in progress and the first major project I have worked on in Python, as well as the first project that I have used to make Twitch API calls. This project is going to change A LOT. I'll probably have to clean up code while I learn Python.
+This is a work in progress and the first major project I have worked on in Python, as well as the first project that I have used to make Twitch API calls. This project is going to change A LOT. It's going to be rewritten soon as I have learned a lot better ways to do this.
 
 I will have to spend a lot more time documenting as well, though I have comments to explain what every function is for.
 
