@@ -17,6 +17,7 @@ import dateutil.parser
 from pint import UnitRegistry
 import requests
 import config
+import random
 
 app = Flask(__name__)
 
@@ -135,6 +136,12 @@ def glitch_test():
     diff_string = string_time(years, months, days, hours, minutes)
 
     return Response(diff_string, mimetype='text/plain')
+
+@app.route('/conch')
+def conch():
+    """Returns a random response from SpongeBob's Magic Conch shell."""
+    responses = ["Maybe someday.",  "Nothing.", "Neither.", "I don't think so.", "Yes.", "Try asking again."]
+    return Response(random.choice(responses), mimetype='text/plain')
 
 @app.errorhandler(404)
 def page_not_found(error):
