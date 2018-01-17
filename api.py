@@ -146,7 +146,7 @@ def conch():
 @app.errorhandler(404)
 def page_not_found(error):
     """404 Error Handling function. Just returns a plaintext error."""
-    return Response('404 Error: Bad API call.', mimetype='text/plain')
+    return Response('404 Error: Not an API call.', mimetype='text/plain')
 
 def twitch_getid(username):
     """Gets Twitch ID by their username."""
