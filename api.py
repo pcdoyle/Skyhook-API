@@ -61,9 +61,12 @@ def get_weather():
         else:
             weather_full += '. The wind is currently blowing at %skm/h' % str(wind_kmh)
 
-        if float(wind_chill_c) < float(temp_c):
-            weather_full += '. The wind chill is %s°C.' % str(wind_chill_c)
-        else:
+        try:
+            if float(wind_chill_c) < float(temp_c):
+                weather_full += '. The wind chill is %s°C.' % str(wind_chill_c)
+            else:
+                weather_full += '.'
+        except ValueError as err:
             weather_full += '.'
     else:
         weather_full = '%s. There is curently no wind.' % str(weather_full)
