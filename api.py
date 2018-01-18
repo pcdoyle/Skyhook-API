@@ -111,8 +111,8 @@ def get_followage(channelname, username):
 @app.route('/glitch/subage/<channelname>/<username>')
 def get_subage(channelname, username):
     """Get how long someone has been subbed a certain channel."""
-    channelid = twitch_getid(channelname)
-    userid = twitch_getid(username)
+    channelid = twitch_getid(channelname.lower())
+    userid = twitch_getid(username.lower())
     oauth = config.twoauth_new
     sub_result = twitch_subage(channelid, userid, oauth)
 
