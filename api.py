@@ -91,7 +91,7 @@ def convert(unit_one,unit_two,value):
 @app.route('/glitch/getid/<username>')
 def get_twitch_id(username):
     """Returns the userid of a username on Twitch."""
-    twitch_id = twitch_getid(username)
+    twitch_id = twitch_getid(username.lower())
     return Response(twitch_id, mimetype='text/plain')
 
 @app.route('/glitch/getuser/<userid>')
@@ -103,7 +103,7 @@ def get_twitch_user(userid):
 def get_followage(channelname, username):
     """Get how long someone has been following a certain channel."""
     channelid = twitch_getid(channelname)
-    userid = twitch_getid(username)
+    userid = twitch_getid(username.lower())
     follow_result = twitch_followage(channelid, userid)
 
     return Response(follow_result, mimetype='text/plain')
@@ -121,7 +121,7 @@ def get_subage(channelname, username):
 @app.route('/glitch/userage/<username>')
 def get_userage(username):
     """Get how long someone has been following a certain channel."""
-    userid = twitch_getid(username)
+    userid = twitch_getid(username.lower())
     d = twitch_userage(userid)
     response = d.strftime('%B %d, %Y at %I:%M %p %Z')
 
@@ -148,7 +148,7 @@ def conch():
 
 @app.route('/8ball')
 def eightball():
-    """Returns a random response from SpongeBob's Magic Conch shell."""
+    """Returns a random response from a magic 8-ball."""
     responses = ['It is certain.', 'It is decidedly so.', 'Without a doubt.', 'Yes definitely.', 
                  'You may rely on it.', 'As I see it, yes.', 'Most likely.', 'Outlook good.', 'Yes.',
                  'Signs point to yes.', 'Reply hazy try again.', 'Ask again later.',
