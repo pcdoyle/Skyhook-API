@@ -102,7 +102,7 @@ def get_twitch_user(userid):
 @app.route('/glitch/followage/<channelname>/<username>')
 def get_followage(channelname, username):
     """Get how long someone has been following a certain channel."""
-    channelid = twitch_getid(channelname)
+    channelid = twitch_getid(channelname.lower())
     userid = twitch_getid(username.lower())
     follow_result = twitch_followage(channelid, userid)
 
@@ -127,6 +127,12 @@ def get_userage(username):
 
     return Response(response, mimetype='text/plain')
 
+@app.route('/glitch/title/<channelname>')
+def get_title(channelname):
+    """Get the title of the stream of <channelname>."""
+    channelid = twitch_getid(channelname.lower())
+    return Response(twitch_title(channelid), mimetype='text/plain')
+
 @app.route('/glitch/test')
 def glitch_test():
     """Test Function to Testing Twitch API stuff."""
@@ -149,7 +155,7 @@ def conch():
 @app.route('/8ball')
 def eightball():
     """Returns a random response from a magic 8-ball."""
-    responses = ['It is certain.', 'It is decidedly so.', 'Without a doubt.', 'Yes definitely.', 
+    responses = ['It is certain.', 'It is decidedly so.', 'Without a doubt.', 'Yes definitely.',
                  'You may rely on it.', 'As I see it, yes.', 'Most likely.', 'Outlook good.', 'Yes.',
                  'Signs point to yes.', 'Reply hazy try again.', 'Ask again later.',
                  'Better not tell you now.', 'Cannot predict now.', 'Concentrate and ask again.',
@@ -195,7 +201,6 @@ def twitch_followage(channelid, userid):
             return 'Failed to format JSON data from Twitch!'
     except requests.exceptions.RequestException as err:
         return 'Failed to connect to Twitch API server.'
-
     try:
         result = request['data'][0]['followed_at']
         formatted_date = datetime.strptime( result, "%Y-%m-%dT%H:%M:%SZ" )
@@ -286,6 +291,26 @@ def twitch_userage(userid):
 
     except Exception as err:
         return 'User age could not be found.'
+
+    return 'An error occured in the lookup.'
+
+def twitch_title(channelid):
+    """Get's the follow age between two users from the Twitch API."""
+    try:
+        url = 'https://api.twitch.tv/kraken/channels/%s' % (channelid)
+        headers = {'Accept': 'application/vnd.twitchtv.v5+json', 'Client-ID': config.twclientid}
+        request = requests.get(url, headers=headers)
+        try:
+            request = request.json()
+        except Exception as err:
+            return 'Failed to format JSON data from Twitch!'
+    except requests.exceptions.RequestException as err:
+        return 'Failed to connect to Twitch API server.'
+
+    try:
+        return request['status']
+    except Exception as err:
+        return 'Channel title could not be found.'
 
     return 'An error occured in the lookup.'
 
