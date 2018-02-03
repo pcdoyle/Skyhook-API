@@ -133,6 +133,12 @@ def get_title(channelname):
     channelid = twitch_getid(channelname.lower())
     return Response(twitch_title(channelid), mimetype='text/plain')
 
+@app.route('/glitch/game/<channelname>')
+def get_game(channelname):
+    """Get the title of the stream of <channelname>."""
+    channelid = twitch_getid(channelname.lower())
+    return Response(twitch_getgame(channelid), mimetype='text/plain')
+
 @app.route('/glitch/test')
 def glitch_test():
     """Test Function to Testing Twitch API stuff."""
@@ -311,6 +317,26 @@ def twitch_title(channelid):
         return request['status']
     except Exception as err:
         return 'Channel title could not be found.'
+
+    return 'An error occured in the lookup.'
+
+def twitch_getgame(channelid):
+    """Get's the follow age between two users from the Twitch API."""
+    try:
+        url = 'https://api.twitch.tv/kraken/channels/%s' % (channelid)
+        headers = {'Accept': 'application/vnd.twitchtv.v5+json', 'Client-ID': config.twclientid}
+        request = requests.get(url, headers=headers)
+        try:
+            request = request.json()
+        except Exception as err:
+            return 'Failed to format JSON data from Twitch!'
+    except requests.exceptions.RequestException as err:
+        return 'Failed to connect to Twitch API server.'
+
+    try:
+        return request['game']
+    except Exception as err:
+        return 'Channel game could not be found.'
 
     return 'An error occured in the lookup.'
 
