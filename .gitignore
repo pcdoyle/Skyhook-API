@@ -97,5 +97,10 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# PyCharm
+.idea
+
+# My Files to Ignore
 config.py
 oauth.py

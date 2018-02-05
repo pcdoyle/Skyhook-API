@@ -1,6 +1,6 @@
 """
-Skyhook-API
-Copyright 2017: Patrick Doyle. (KaoAtlantis on Twitch)
+Skyhook-API Beta
+Copyright 2018: Patrick Doyle. (KaoAtlantis on Twitch)
 Repositoy: https://github.com/pcdoyle/Skyhook-API
 License: MIT
 ____________________________________________________________________
@@ -16,15 +16,18 @@ from dateutil import relativedelta
 import dateutil.parser
 from pint import UnitRegistry
 import requests
-import config
 import random
+# Local Imports:
+import config
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def startpage():
     """The start page for the server."""
     return Response('Skyhook\'s custom API Server.', mimetype='text/plain')
+
 
 @app.route('/weather')
 def get_weather():
@@ -73,6 +76,7 @@ def get_weather():
 
     return Response(weather_full, mimetype='text/plain')
 
+
 @app.route('/beta_convert/<unit_one>/<unit_two>/<value>')
 def convert(unit_one,unit_two,value):
     """Will be a conversion function to convert units of measurement.
@@ -88,16 +92,19 @@ def convert(unit_one,unit_two,value):
 
     return Response(value + unit_one + ' to ' + unit_two + ' is ' + str(round(converted, 2)) + ' [This API is in Beta]', mimetype='text/plain')
 
+
 @app.route('/glitch/getid/<username>')
 def get_twitch_id(username):
     """Returns the userid of a username on Twitch."""
     twitch_id = twitch_getid(username.lower())
     return Response(twitch_id, mimetype='text/plain')
 
+
 @app.route('/glitch/getuser/<userid>')
 def get_twitch_user(userid):
     """Will return user information from the userid given."""
     return Response('User ID: ' + userid, mimetype='text/plain')
+
 
 @app.route('/glitch/followage/<channelname>/<username>')
 def get_followage(channelname, username):
@@ -107,6 +114,7 @@ def get_followage(channelname, username):
     follow_result = twitch_followage(channelid, userid)
 
     return Response(follow_result, mimetype='text/plain')
+
 
 @app.route('/glitch/subage/<channelname>/<username>')
 def get_subage(channelname, username):
@@ -118,6 +126,7 @@ def get_subage(channelname, username):
 
     return Response(sub_result, mimetype='text/plain')
 
+
 @app.route('/glitch/userage/<username>')
 def get_userage(username):
     """Get how long someone has been following a certain channel."""
@@ -127,17 +136,20 @@ def get_userage(username):
 
     return Response(response, mimetype='text/plain')
 
+
 @app.route('/glitch/title/<channelname>')
 def get_title(channelname):
     """Get the title of the stream of <channelname>."""
     channelid = twitch_getid(channelname.lower())
     return Response(twitch_title(channelid), mimetype='text/plain')
 
+
 @app.route('/glitch/game/<channelname>')
 def get_game(channelname):
     """Get the title of the stream of <channelname>."""
     channelid = twitch_getid(channelname.lower())
     return Response(twitch_getgame(channelid), mimetype='text/plain')
+
 
 @app.route('/glitch/test')
 def glitch_test():
@@ -152,11 +164,13 @@ def glitch_test():
 
     return Response(diff_string, mimetype='text/plain')
 
+
 @app.route('/conch')
 def conch():
     """Returns a random response from SpongeBob's Magic Conch shell."""
     responses = ["Maybe someday.",  "Nothing.", "Neither.", "I don't think so.", "Yes.", "Try asking again."]
     return Response(random.choice(responses), mimetype='text/plain')
+
 
 @app.route('/8ball')
 def eightball():
@@ -168,10 +182,12 @@ def eightball():
                  'Don\'t count on it.', 'My reply is no.', 'My sources say no.', 'Outlook not so good.', 'Very doubtful.']
     return Response(random.choice(responses), mimetype='text/plain')
 
+
 @app.errorhandler(404)
 def page_not_found(error):
     """404 Error Handling function. Just returns a plaintext error."""
     return Response('404 Error: Not an API call.', mimetype='text/plain')
+
 
 def twitch_getid(username):
     """Gets Twitch ID by their username."""
@@ -194,6 +210,7 @@ def twitch_getid(username):
         result = 'No user with that name found!'
 
     return result
+
 
 def twitch_followage(channelid, userid):
     """Get's the follow age between two users from the Twitch API."""
@@ -229,6 +246,7 @@ def twitch_followage(channelid, userid):
         return 'User is not following this channel.'
 
     return 'An error occured in the lookup.'
+
 
 def twitch_subage(channelid, userid, oauth):
     """Get's the follow age between two users from the Twitch API."""
@@ -275,6 +293,7 @@ def twitch_subage(channelid, userid, oauth):
 
     return 'An error occured in the lookup.'
 
+
 def twitch_userage(userid):
     """Get's the follow age between two users from the Twitch API."""
     try:
@@ -300,6 +319,7 @@ def twitch_userage(userid):
 
     return 'An error occured in the lookup.'
 
+
 def twitch_title(channelid):
     """Get's the follow age between two users from the Twitch API."""
     try:
@@ -320,6 +340,7 @@ def twitch_title(channelid):
 
     return 'An error occured in the lookup.'
 
+
 def twitch_getgame(channelid):
     """Get's the follow age between two users from the Twitch API."""
     try:
@@ -338,7 +359,9 @@ def twitch_getgame(channelid):
     except Exception as err:
         return 'Channel game could not be found.'
 
+
     return 'An error occured in the lookup.'
+
 
 def string_time(years, months, days, hours, minutes):
     """ Figures out what needs to be output between year, month, day, hour, and minute."""
@@ -364,11 +387,13 @@ def string_time(years, months, days, hours, minutes):
 
     return string
 
+
 def pluralize(number, word):
     """Figures out if a word needs to be pluralized depending on the number provided."""
     if not number == 1:
         word += 's'
     return word
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
