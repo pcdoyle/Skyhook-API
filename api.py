@@ -151,6 +151,13 @@ def get_game(channelname):
     return Response(twitch_getgame(channelid), mimetype='text/plain')
 
 
+@app.route('/glitch/botcheck/<username>')
+def get_botstatus(username):
+    """Checks if Twitch knows <username> is a bot."""
+    userid = twitch_getid(username.lower())
+    return Response(twitch_botcheck(userid), mimetype='text/plain')
+
+
 @app.route('/glitch/test')
 def glitch_test():
     """Test Function to Testing Twitch API stuff."""
@@ -335,6 +342,42 @@ def twitch_title(channelid):
 
     try:
         return request['status']
+    except Exception as err:
+        return 'Channel title could not be found.'
+
+    return 'An error occured in the lookup.'
+
+
+def twitch_botcheck(userid):
+    """Get's the follow age between two users from the Twitch API."""
+    respOne = ''
+    respTwo = ''
+    resp = ''
+
+    try:
+        url = 'https://api.twitch.tv/kraken/users/%s/chat' % (userid)
+        headers = {'Accept': 'application/vnd.twitchtv.v5+json', 'Client-ID': config.twclientid}
+        request = requests.get(url, headers=headers)
+        try:
+            request = request.json()
+        except Exception as err:
+            return 'Failed to format JSON data from Twitch!'
+    except requests.exceptions.RequestException as err:
+        return 'Failed to connect to Twitch API server.'
+
+    try:
+        if request['is_verified_bot'] is True:
+            respOne = 'Twitch has verified me as a bot'
+        else:
+            respOne = 'Twitch has not verified me as a bot yet'
+
+        if request['is_known_bot'] is True:
+            respTwo = 'Twitch knows I am a bot'
+        else:
+            respTwo = 'Twitch does not know I am a bot'
+
+        return respTwo + ' and ' + respOne + '!'
+
     except Exception as err:
         return 'Channel title could not be found.'
 
