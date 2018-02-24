@@ -33,7 +33,7 @@ def startpage():
 def get_weather():
     """Pulls Weather Data from Weather Underground: Currently only works for one location."""
     try:
-        result = requests.get('http://api.wunderground.com/api/' + config.wukey + '/geolookup/conditions/q/pws:IBCABBOT1.json')
+        result = requests.get('http://api.wunderground.com/api/' + config.wukey + '/geolookup/conditions/q/pws:IMISSION3.json')
         try:
             weather = result.json()
         except Exception as err:
@@ -75,6 +75,22 @@ def get_weather():
         weather_full = '%s. There is curently no wind.' % str(weather_full)
 
     return Response(weather_full, mimetype='text/plain')
+
+
+"""
+curl -X "GET" "" -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: "
+"""
+
+@app.route('/music/song')
+def music_song():
+    """Spotify API stuff doesn't work at all yet"""
+    return Response('Song.', mimetype='text/plain')
+
+
+@app.route('/music/playlist')
+def music_playlist():
+    """Spotify API stuff doesn't work at all yet"""
+    return Response('Playlist.', mimetype='text/plain')
 
 
 @app.route('/beta_convert/<unit_one>/<unit_two>/<value>')
