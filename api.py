@@ -160,6 +160,13 @@ def get_title(channelname):
     return Response(twitch_title(channelid), mimetype='text/plain')
 
 
+@app.route('/glitch/subcount/<channelname>')
+def get_subcount(channelname):
+    """Get the title of the stream of <channelname>."""
+    channelid = twitch_getid(channelname.lower())
+    return Response(twitch_subcount(channelid, config.twoauth_new), mimetype='text/plain')
+
+
 @app.route('/glitch/game/<channelname>')
 def get_game(channelname):
     """Get the title of the stream of <channelname>."""
@@ -360,6 +367,29 @@ def twitch_title(channelid):
         return request['status']
     except Exception as err:
         return 'Channel title could not be found.'
+
+    return 'An error occured in the lookup.'
+
+
+def twitch_subcount(channelid, oauth):
+    """Get's the sub count of a channel."""
+    try:
+        url = 'https://api.twitch.tv/kraken/channels/%s/subscriptions?limit=1' % (channelid)
+        headers = {'Accept': 'application/vnd.twitchtv.v5+json', 'Client-ID': config.twclientid, 'Authorization': 'OAuth ' + oauth}
+        request = requests.get(url, headers=headers)
+        try:
+            request = request.json()
+        except Exception as err:
+            return 'Failed to format JSON data from Twitch!'
+    except requests.exceptions.RequestException as err:
+        return 'Failed to connect to Twitch API server.'
+
+    try:
+        print(request)
+        return str(request['_total']-4)
+    except Exception as err:
+        print(request)
+        return 'Channel sub count could not be found.'
 
     return 'An error occured in the lookup.'
 
