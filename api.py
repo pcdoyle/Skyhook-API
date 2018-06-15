@@ -212,6 +212,12 @@ def eightball():
                  'Don\'t count on it.', 'My reply is no.', 'My sources say no.', 'Outlook not so good.', 'Very doubtful.']
     return Response(random.choice(responses), mimetype='text/plain')
 
+@app.route('/snek')
+def snek():
+    """Returns a random response for Norton the Snake."""
+    responses = ["Bitch, I'm back!", "Hi, I'm Norton!", "Oscar and Onion are dead.", "I'm cold. :(", "Feed me bits.", "Thanks for the bits!"]
+    return Response(random.choice(responses), mimetype='text/plain')
+
 
 @app.errorhandler(404)
 def page_not_found(error):
