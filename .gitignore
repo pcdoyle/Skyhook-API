@@ -101,6 +101,9 @@ ENV/
 # PyCharm
 .idea
 
+# My Folders to Ignore
+.vscode/
+
 # My Files to Ignore
 config.py
 oauth.py
