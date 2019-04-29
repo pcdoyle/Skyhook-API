@@ -34,7 +34,7 @@ def startpage():
 def get_weather():
     """Pulls Weather Data from Weather Underground: Currently only works for one location."""
     try:
-        result = requests.get('http://api.wunderground.com/api/' + config.wukey + '/geolookup/conditions/q/pws:IMISSION3.json')
+        result = requests.get('https://api.darksky.net/forecast/' + config.darksky_secret + '/49.1329,-122.3261?units=ca')
         try:
             weather = result.json()
         except Exception as err:
@@ -43,37 +43,53 @@ def get_weather():
         return Response('Failed to connect to weather API!', mimetype='text/plain')
 
     try:
-        weather_desc = weather['current_observation']['weather']
-        temp_c = weather['current_observation']['temp_c']
-        temp_c_feels = weather['current_observation']['feelslike_c']
-        wind_chill_c = weather['current_observation']['windchill_c']
-        temp_f = weather['current_observation']['temp_f']
-        wind_kmh = weather['current_observation']['wind_kph']
-        wind_kmh_gust = weather['current_observation']['wind_gust_kph']
-        wind_string = weather['current_observation']['wind_string']
+        w_summary       = weather['currently']['summary']
+        w_temp          = weather['currently']['temperature']
+        w_temp_feels    = weather['currently']['apparentTemperature']
+        w_humidity      = weather['currently']['humidity']
+        w_windspeed     = weather['currently']['windSpeed']
+        w_windgusts     = weather['currently']['windGust']
+        w_percipchance  = weather['currently']['precipProbability']
+
+        try:
+            w_percipdesc = weather['currently']['precipType']
+        except:
+            w_percipdesc = False
+
     except Exception as err:
         return Response('Failed to pull weather data! Usually caused by an incorrect API key.', mimetype='text/plain')
 
-    weather_full = '%s with a temperature of %s°C (%s°F)' % (str(weather_desc), str(temp_c), str(temp_f))
+    weather_full = '%s with a temperature of %s°C (%s°F)' % (str(w_summary), str(w_temp), str(convert_c2f(w_temp)))
 
-    if float(temp_c_feels) < float(temp_c):
-        weather_full += '. It feels like %s°C' % str(temp_c_feels)
+    if float(w_temp_feels) < float(w_temp):
+        weather_full += '. It feels like %s°C' % str(w_temp_feels)
 
-    if float(wind_kmh) > 0:
-        if float(wind_kmh_gust) > 0:
-            weather_full += '. The wind is currently blowing at %skm/h with gusts of %skm/h' % (str(wind_kmh), str(wind_kmh_gust))
+    if float(w_windspeed) > 0:
+        if float(w_windgusts) > 0:
+            weather_full += '. The wind is currently blowing at %skm/h with gusts of %skm/h' % (str(w_windspeed), str(w_windgusts))
         else:
-            weather_full += '. The wind is currently blowing at %skm/h' % str(wind_kmh)
+            weather_full += '. The wind is currently blowing at %skm/h' % str(w_windspeed)
 
         try:
-            if float(wind_chill_c) < float(temp_c):
-                weather_full += '. The wind chill is %s°C.' % str(wind_chill_c)
+            if float(w_temp_feels) < float(w_temp):
+                weather_full += '. The wind chill is %s°C.' % str(w_temp_feels)
             else:
                 weather_full += '.'
         except ValueError as err:
             weather_full += '.'
     else:
         weather_full = '%s. There is curently no wind.' % str(weather_full)
+
+    if float(w_humidity) > 0:
+        w_humidity_converted = w_humidity * 100
+        weather_full += ' The Humidity is %s%%.' % str(int(w_humidity_converted))
+
+    if float(w_percipchance) > 0:
+        w_percipchance_converted = w_percipchance * 100
+
+        if w_percipdesc != False:
+            weather_full += ' There is a %s%% chance of %s.' % (str(int(w_percipchance_converted)), str(w_percipdesc))
+
 
     return Response(weather_full, mimetype='text/plain')
 
