@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Skyhook-API Beta
 Copyright 2018: Patrick Doyle. (KaoAtlantis on Twitch)
