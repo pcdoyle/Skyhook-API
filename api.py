@@ -108,6 +108,12 @@ def convert(unit_one,unit_two,value):
 
     return Response(value + unit_one + ' to ' + unit_two + ' is ' + str(round(converted, 2)) + ' [This API is in Beta]', mimetype='text/plain')
 
+@app.route('/convert/<conversion>/<value>')
+def temp_convert(conversion,value):
+    """
+    A conversion function to convert units of temperature.
+    """
+    return Response(convert_temp(conversion,value), mimetype='text/plain')
 
 @app.route('/glitch/getid/<username>')
 def get_twitch_id(username):
@@ -488,6 +494,97 @@ def pluralize(number, word):
     if not number == 1:
         word += 's'
     return word
+
+def convert_temp(conversion, value):
+
+    try:
+        if (conversion == 'c2f'):
+            try:
+                num = float(value)
+
+                result_a = convert_c2f(num)
+                result_b = convert_c2k(num)
+
+                return(str(num) + '°C is ' + str(result_a) + '°F (or ' + str(result_b) + ' Kelvin).')
+            except:
+                return('Not a number.')
+
+        elif (conversion == 'f2c'):
+            try:
+                num = float(value)
+
+                result_a = convert_f2c(num)
+                result_b = convert_c2k(result_a)
+
+                return(str(num) + '°F is ' + str(result_a) + '°C (or ' + str(result_b) + ' Kelvin).')
+            except:
+                return('Not a number.')
+
+        elif (conversion == 'k2f'):
+            try:
+                num = float(value)
+
+                result_a = convert_k2c(num)
+                result_b = convert_c2f(result_a)
+
+                return(str(num) + ' Kelvin is ' + str(result_b) + '°F (or ' + str(result_a) + '°C).')
+            except:
+                return('Not a number.')
+
+        elif (conversion == 'k2c'):
+            try:
+                num = float(value)
+
+                result_a = convert_k2c(num)
+                result_b = convert_c2f(result_a)
+
+                return(str(num) + ' Kelvin is ' + str(result_a) + '°C (or ' + str(result_b) + '°F).')
+            except:
+                return('Not a number.')
+
+        elif (conversion == 'f2k'):
+            try:
+                num = float(value)
+
+                result_a = convert_f2c(num)
+                result_b = convert_c2k(result_a)
+
+                return(str(num) + '°F is ' + str(result_b) + ' Kelvin (or ' + str(result_a) + '°C).')
+            except:
+                return('Not a number.')
+
+        elif (conversion == 'c2k'):
+            try:
+                num = float(value)
+
+                result_a = convert_c2k(num)
+                result_b = convert_c2f(num)
+
+                return(str(num) + '°C is ' + str(result_a) + ' Kelvin (or ' + str(result_b) + '°F).')
+            except:
+                return('Not a number.')
+
+    except:
+        return('Something went terribly wrong.')
+
+    return('Not a conversion.')
+
+def convert_c2f(num):
+    result = round((num*9/5)+32,2)
+    return(result)
+
+def convert_f2c(num):
+    result = round((num-32)*5/9,2)
+    return(result)
+
+def convert_k2c(num):
+    result = round(num-273.15,2)
+    return(result)
+
+def convert_c2k(num):
+    result = round(num+273.15,2)
+    return(result)
+
 
 
 if __name__ == "__main__":
